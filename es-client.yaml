@@ -54,7 +54,7 @@ spec:
         - name: HTTP_ENABLE
           value: "true"
         - name: ES_JAVA_OPTS
-          value: -Xms1g -Xmx2g
+          value: -Xms2g -Xmx2g
         - name: NETWORK_HOST
           value: _site_,_lo_
         - name: PROCESSORS

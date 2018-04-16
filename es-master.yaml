@@ -26,6 +26,15 @@ spec:
                 operator: In
                 values:
                 - master
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: role
+                operator: In
+                values:
+                - master
+            topologyKey: "kubernetes.io/hostname"
       initContainers:
       - name: init-sysctl
         image: busybox:1.27.2

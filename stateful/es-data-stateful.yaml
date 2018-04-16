@@ -72,9 +72,6 @@ spec:
             resourceFieldRef:
               resource: limits.cpu
         resources:
-          requests:
-            cpu: 3
-            memory: "12Gi"
           limits:
             cpu: 3
             memory: "12Gi"

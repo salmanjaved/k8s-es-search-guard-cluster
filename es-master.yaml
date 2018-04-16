@@ -14,18 +14,6 @@ spec:
         role: master
     spec:
       affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: component
-                operator: In
-                values:
-                - elasticsearch
-              - key: role
-                operator: In
-                values:
-                - master
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:

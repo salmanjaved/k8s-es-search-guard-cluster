@@ -14,18 +14,6 @@ spec:
         role: client
     spec:
       affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: component
-                operator: In
-                values:
-                - elasticsearch
-              - key: role
-                operator: In
-                values:
-                - client
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
@@ -33,6 +21,7 @@ spec:
               - key: role
                 operator: In
                 values:
+                - master
                 - client
             topologyKey: "kubernetes.io/hostname"
       initContainers:

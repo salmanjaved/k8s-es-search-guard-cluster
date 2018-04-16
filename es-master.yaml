@@ -77,7 +77,7 @@ spec:
         resources:
           limits:
             cpu: 1
-            memory: "5Gi"
+            memory: "4Gi"
         ports:
         - containerPort: 9300
           name: transport

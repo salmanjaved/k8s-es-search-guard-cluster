@@ -45,7 +45,7 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         - name: CLUSTER_NAME
-          value: myesdb
+          value: lionstep-elasticsearch
         - name: NUMBER_OF_MASTERS
           value: "2"
         - name: NODE_MASTER

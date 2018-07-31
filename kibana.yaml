@@ -19,7 +19,7 @@ spec:
         image: docker.elastic.co/kibana/kibana-oss:6.3.0
         env:
         - name: CLUSTER_NAME
-          value: myesdb
+          value: lionstep-elasticsearch
         - name: SERVER_BASEPATH
           value: /api/v1/namespaces/default/services/kibana:http/proxy
         resources:

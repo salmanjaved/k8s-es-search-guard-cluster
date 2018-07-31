@@ -1,17 +1,17 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: es-client
+  name: es-ingest
   labels:
     component: elasticsearch
-    role: client
+    role: ingest
 spec:
   replicas: 2
   template:
     metadata:
       labels:
         component: elasticsearch
-        role: client
+        role: ingest
     spec:
       affinity:
         podAntiAffinity:
@@ -34,8 +34,8 @@ spec:
         securityContext:
           privileged: true
       containers:
-      - name: es-client
-        image: quay.io/pires/docker-elasticsearch-kubernetes:6.2.2_1
+      - name: es-ingest
+        image: quay.io/pires/docker-elasticsearch-kubernetes:6.3.0
         env:
         - name: NAMESPACE
           valueFrom:
@@ -62,6 +62,8 @@ spec:
             resourceFieldRef:
               resource: limits.cpu
         resources:
+          requests:
+            cpu: 0.25
           limits:
             cpu: 1
             memory: "4Gi"
@@ -73,6 +75,8 @@ spec:
         livenessProbe:
           tcpSocket:
             port: transport
+          initialDelaySeconds: 20
+          periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /_cluster/health

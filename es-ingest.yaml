@@ -55,6 +55,8 @@ spec:
           value: "true"
         - name: ES_JAVA_OPTS
           value: -Xms2g -Xmx2g
+        - name: ES_PLUGINS_INSTALL
+          value: "com.floragunn:search-guard-6:6.3.0-22.3"
         - name: NETWORK_HOST
           value: _site_,_lo_
         - name: PROCESSORS

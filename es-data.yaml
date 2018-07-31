@@ -44,6 +44,8 @@ spec:
           value: "true"
         - name: ES_JAVA_OPTS
           value: -Xms256m -Xmx256m
+        - name: ES_PLUGINS_INSTALL
+          value: "com.floragunn:search-guard-6:6.3.0-22.3"
         - name: PROCESSORS
           valueFrom:
             resourceFieldRef:

@@ -22,7 +22,7 @@ spec:
                 operator: In
                 values:
                 - master
-                - client
+                - ingest
             topologyKey: "kubernetes.io/hostname"
       initContainers:
       - name: init-sysctl

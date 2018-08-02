@@ -6,7 +6,7 @@ metadata:
     component: elasticsearch
     role: master
 spec:
-  replicas: 3
+  replicas: 5
   template:
     metadata:
       labels:
@@ -34,7 +34,7 @@ spec:
           privileged: true
       containers:
       - name: es-master
-        image: quay.io/pires/docker-elasticsearch-kubernetes:6.3.0
+        image: xanthoustech/es-k8s-search-guard:latest
         env:
         - name: NAMESPACE
           valueFrom:
@@ -47,7 +47,7 @@ spec:
         - name: CLUSTER_NAME
           value: lionstep-elasticsearch
         - name: NUMBER_OF_MASTERS
-          value: "2"
+          value: "3"
         - name: NODE_MASTER
           value: "true"
         - name: NODE_INGEST
@@ -57,9 +57,7 @@ spec:
         - name: HTTP_ENABLE
           value: "false"
         - name: ES_JAVA_OPTS
-          value: -Xms2g -Xmx2g
-        - name: ES_PLUGINS_INSTALL
-          value: "com.floragunn:search-guard-6:6.3.0-22.3"
+          value: -Xms1g -Xmx1g
         - name: PROCESSORS
           valueFrom:
             resourceFieldRef:
@@ -69,7 +67,7 @@ spec:
             cpu: 0.25
           limits:
             cpu: 1
-            memory: "4Gi"
+            memory: "2Gi"
         ports:
         - containerPort: 9300
           name: transport
@@ -81,6 +79,21 @@ spec:
         volumeMounts:
         - name: storage
           mountPath: /data
+        # lifecycle:
+        #   postStart:
+        #     exec:
+        #       command:
+        #       - /elasticsearch/plugins/search-guard-6/tools/sgadmin.sh
+        #       - -cd
+        #       - /elasticsearch/plugins/search-guard-6/sgconfig
+        #       - -icl
+        #       - -key
+        #       - /elasticsearch/config/pipeline.key
+        #       - -cert
+        #       - /elasticsearch/config/pipeline.pem
+        #       - -cacert
+        #       - /elasticsearch/config/root-ca.pem
+        #       - -nhnv
       volumes:
           - emptyDir:
               medium: ""

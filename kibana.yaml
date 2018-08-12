@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: kibana
-        image: docker.elastic.co/kibana/kibana-oss:6.3.0
+        image: xanthoustech/kibana-k8s-search-guard:latest
         env:
         - name: CLUSTER_NAME
           value: lionstep-elasticsearch

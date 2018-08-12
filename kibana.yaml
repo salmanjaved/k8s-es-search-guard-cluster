@@ -20,8 +20,8 @@ spec:
         env:
         - name: CLUSTER_NAME
           value: lionstep-elasticsearch
-        - name: SERVER_BASEPATH
-          value: /api/v1/namespaces/default/services/kibana:http/proxy
+        # - name: SERVER_BASEPATH
+        #   value: /api/v1/namespaces/default/services/kibana:http/proxy
         resources:
           limits:
             cpu: 1000m

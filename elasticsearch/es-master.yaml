@@ -1,17 +1,17 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: es-ingest
+  name: es-master
   labels:
     component: elasticsearch
-    role: ingest
+    role: master
 spec:
-  replicas: 2
+  replicas: 5
   template:
     metadata:
       labels:
         component: elasticsearch
-        role: ingest
+        role: master
     spec:
       affinity:
         podAntiAffinity:
@@ -22,7 +22,6 @@ spec:
                 operator: In
                 values:
                 - master
-                - ingest
             topologyKey: "kubernetes.io/hostname"
       initContainers:
       - name: init-sysctl
@@ -34,7 +33,7 @@ spec:
         securityContext:
           privileged: true
       containers:
-      - name: es-ingest
+      - name: es-master
         image: xanthoustech/es-k8s-search-guard:latest
         env:
         - name: NAMESPACE
@@ -47,16 +46,18 @@ spec:
               fieldPath: metadata.name
         - name: CLUSTER_NAME
           value: lionstep-elasticsearch
+        - name: NUMBER_OF_MASTERS
+          value: "3"
         - name: NODE_MASTER
+          value: "true"
+        - name: NODE_INGEST
           value: "false"
         - name: NODE_DATA
           value: "false"
         - name: HTTP_ENABLE
-          value: "true"
+          value: "false"
         - name: ES_JAVA_OPTS
-          value: -Xms2g -Xmx2g
-        - name: NETWORK_HOST
-          value: _site_,_lo_
+          value: -Xms1g -Xmx1g
         - name: PROCESSORS
           valueFrom:
             resourceFieldRef:
@@ -66,10 +67,8 @@ spec:
             cpu: 0.25
           limits:
             cpu: 1
-            memory: "4Gi"
+            memory: "2Gi"
         ports:
-        - containerPort: 9200
-          name: http
         - containerPort: 9300
           name: transport
         livenessProbe:
@@ -77,28 +76,30 @@ spec:
             port: transport
           initialDelaySeconds: 20
           periodSeconds: 10
-        readinessProbe:
-          exec:
-            command:
-              - plugins/search-guard-6/tools/sgadmin.sh
-              - -h
-              - "0.0.0.0"
-              - -key
-              - config/pipeline.key
-              - -cert
-              - config/pipeline.pem
-              - -cacert
-              - config/root-ca.pem
-              - -nhnv
-              - -icl
-              - -si
-          initialDelaySeconds: 30
-          timeoutSeconds: 5
-          periodSeconds: 10
         volumeMounts:
         - name: storage
           mountPath: /data
+        - name: config-volume
+          mountPath: /elasticsearch/config
+        # lifecycle:
+        #   postStart:
+        #     exec:
+        #       command:
+        #       - /elasticsearch/plugins/search-guard-6/tools/sgadmin.sh
+        #       - -cd
+        #       - /elasticsearch/plugins/search-guard-6/sgconfig
+        #       - -icl
+        #       - -key
+        #       - /elasticsearch/config/pipeline.key
+        #       - -cert
+        #       - /elasticsearch/config/pipeline.pem
+        #       - -cacert
+        #       - /elasticsearch/config/root-ca.pem
+        #       - -nhnv
       volumes:
-          - emptyDir:
-              medium: ""
-            name: storage
+      - name: "storage"
+        emptyDir:
+          medium: ""
+      - name: config-volume
+        configMap:
+          name: es-config

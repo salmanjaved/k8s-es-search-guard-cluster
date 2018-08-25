@@ -1,18 +1,29 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: es-data
+  name: es-ingest
   labels:
     component: elasticsearch
-    role: data
+    role: ingest
 spec:
   replicas: 2
   template:
     metadata:
       labels:
         component: elasticsearch
-        role: data
+        role: ingest
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: role
+                operator: In
+                values:
+                - master
+                - ingest
+            topologyKey: "kubernetes.io/hostname"
       initContainers:
       - name: init-sysctl
         image: busybox:1.27.2
@@ -23,8 +34,8 @@ spec:
         securityContext:
           privileged: true
       containers:
-      - name: es-data
-        image: quay.io/pires/docker-elasticsearch-kubernetes:6.3.0
+      - name: es-ingest
+        image: xanthoustech/es-k8s-search-guard:latest
         env:
         - name: NAMESPACE
           valueFrom:
@@ -38,14 +49,14 @@ spec:
           value: lionstep-elasticsearch
         - name: NODE_MASTER
           value: "false"
-        - name: NODE_INGEST
+        - name: NODE_DATA
           value: "false"
         - name: HTTP_ENABLE
           value: "true"
         - name: ES_JAVA_OPTS
-          value: -Xms256m -Xmx256m
-        - name: ES_PLUGINS_INSTALL
-          value: "com.floragunn:search-guard-6:6.3.0-22.3"
+          value: -Xms2g -Xmx2g
+        - name: NETWORK_HOST
+          value: _site_,_lo_
         - name: PROCESSORS
           valueFrom:
             resourceFieldRef:
@@ -55,6 +66,7 @@ spec:
             cpu: 0.25
           limits:
             cpu: 1
+            memory: "4Gi"
         ports:
         - containerPort: 9200
           name: http
@@ -66,15 +78,32 @@ spec:
           initialDelaySeconds: 20
           periodSeconds: 10
         readinessProbe:
-          httpGet:
-            path: /_cluster/health
-            port: http
-          initialDelaySeconds: 20
+          exec:
+            command:
+              - plugins/search-guard-6/tools/sgadmin.sh
+              - -h
+              - "0.0.0.0"
+              - -key
+              - config/pipeline.key
+              - -cert
+              - config/pipeline.pem
+              - -cacert
+              - config/root-ca.pem
+              - -nhnv
+              - -icl
+              - -si
+          initialDelaySeconds: 30
           timeoutSeconds: 5
+          periodSeconds: 10
         volumeMounts:
         - name: storage
           mountPath: /data
+        - name: config-volume
+          mountPath: /elasticsearch/config
       volumes:
-          - emptyDir:
-              medium: ""
-            name: storage
+      - name: "storage"
+        emptyDir:
+          medium: ""
+      - name: config-volume
+        configMap:
+          name: es-config

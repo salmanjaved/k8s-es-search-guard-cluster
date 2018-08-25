@@ -96,6 +96,12 @@ spec:
         volumeMounts:
         - name: storage
           mountPath: /data
+        - name: config-volume
+          mountPath: /elasticsearch/config
+      volumes:
+      - name: config-volume
+        configMap:
+          name: es-config
   volumeClaimTemplates:
   - metadata:
       name: storage

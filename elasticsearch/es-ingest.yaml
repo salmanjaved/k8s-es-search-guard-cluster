@@ -62,11 +62,11 @@ spec:
             resourceFieldRef:
               resource: limits.cpu
         resources:
-          requests:
-            cpu: 0.25
           limits:
-            cpu: 1
-            memory: "4Gi"
+            cpu: "1"
+          requests:
+            cpu: 25m
+            memory: 512Mi
         ports:
         - containerPort: 9200
           name: http

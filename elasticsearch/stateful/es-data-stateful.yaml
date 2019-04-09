@@ -60,11 +60,11 @@ spec:
             resourceFieldRef:
               resource: limits.cpu
         resources:
-          requests:
-            cpu: 0.25
           limits:
-            cpu: 2
-            memory: "8Gi"
+            cpu: "1"
+          requests:
+            cpu: 25m
+            memory: 1536Mi
         ports:
         - containerPort: 9200
           name: http
@@ -110,4 +110,4 @@ spec:
       accessModes: [ ReadWriteOnce ]
       resources:
         requests:
-          storage: 2Ti
+          storage: 30Gi
